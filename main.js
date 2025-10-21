@@ -23,7 +23,7 @@ map.on('load', () => {
     // Слой стран
     map.addSource('countries', {
         type: 'geojson',
-        data: './countries.geojson',  // ← ИЗМЕНЕНО
+        data: './countries.geojson',
         attribution: 'Natural Earth'
     });
 
@@ -39,7 +39,7 @@ map.on('load', () => {
     // Слой рек
     map.addSource('rivers', {
         type: 'geojson',
-        data: './rivers.geojson'  // ← ИЗМЕНЕНО
+        data: './rivers.geojson'
     });
 
     map.addLayer({
@@ -54,7 +54,7 @@ map.on('load', () => {
     // Слой озер
     map.addSource('lakes', {
         type: 'geojson',
-        data: './lakes.geojson'  // ← ИЗМЕНЕНО
+        data: './lakes.geojson'
     });
 
     map.addLayer({
@@ -67,10 +67,10 @@ map.on('load', () => {
         }
     });
 
-    // Слой городов
+    // Слой городов - ИСПРАВЛЕН ПУТЬ!
     map.addSource('cities', {
         type: 'geojson',
-        data: './datacities.geojson'  // ← ИЗМЕНЕНО
+        data: './cities.geojson'  // ← ИЗМЕНЕНО ЗДЕСЬ
     });
 
     // Добавляем обработчик загрузки данных
