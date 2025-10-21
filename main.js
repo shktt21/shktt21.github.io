@@ -23,7 +23,7 @@ map.on('load', () => {
     // Слой стран
     map.addSource('countries', {
         type: 'geojson',
-        data: './data/countries.geojson',
+        data: './countries.geojson',  // ← ИЗМЕНЕНО
         attribution: 'Natural Earth'
     });
 
@@ -39,7 +39,7 @@ map.on('load', () => {
     // Слой рек
     map.addSource('rivers', {
         type: 'geojson',
-        data: './data/rivers.geojson'
+        data: './rivers.geojson'  // ← ИЗМЕНЕНО
     });
 
     map.addLayer({
@@ -54,7 +54,7 @@ map.on('load', () => {
     // Слой озер
     map.addSource('lakes', {
         type: 'geojson',
-        data: './data/lakes.geojson'
+        data: './lakes.geojson'  // ← ИЗМЕНЕНО
     });
 
     map.addLayer({
@@ -70,15 +70,17 @@ map.on('load', () => {
     // Слой городов
     map.addSource('cities', {
         type: 'geojson',
-        data: './data/cities.geojson'
+        data: './datacities.geojson'  // ← ИЗМЕНЕНО
     });
 
     // Добавляем обработчик загрузки данных
-    map.on('sourcedata', 'cities', (event) => {
-        if (event.type === 'load') {
-            console.log('Данные городов загружены успешно');
-        } else {
-            console.error('Ошибка загрузки данных городов:', event);
+    map.on('sourcedata', (event) => {
+        if (event.sourceId === 'cities') {
+            if (event.isSourceLoaded) {
+                console.log('Данные городов загружены успешно');
+            } else if (event.error) {
+                console.error('Ошибка загрузки данных городов:', event.error);
+            }
         }
     });
 
@@ -96,7 +98,7 @@ map.on('load', () => {
         if (e.features && e.features.length > 0) {
             new maplibregl.Popup()
                 .setLngLat(e.features[0].geometry.coordinates)
-                .setHTML(e.features[0].properties.NAME)
+                .setHTML(e.features[0].properties.NAME || e.features[0].properties.name || 'Город')
                 .addTo(map);
         }
     });
@@ -110,5 +112,16 @@ map.on('load', () => {
 
     map.on('mouseleave', 'cities-layer', () => {
         map.getCanvas().style.cursor = '';
+    });
+
+    // Добавляем обработчики ошибок для всех источников
+    map.on('error', (e) => {
+        console.error('Ошибка карты:', e.error);
+    });
+
+    map.on('sourcedata', (e) => {
+        if (e.error) {
+            console.error('Ошибка загрузки источника', e.sourceId, ':', e.error);
+        }
     });
 });
