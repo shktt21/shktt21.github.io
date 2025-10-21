@@ -67,18 +67,20 @@ map.on('load', () => {
         }
     });
 
-    // Слой городов
+    // Слой городов - ИСПРАВЛЕН ПУТЬ!
     map.addSource('cities', {
         type: 'geojson',
-        data: './data/cities.geojson'
+        data: './data/datacities.geojson'  // ← ИЗМЕНЕНО ЗДЕСЬ
     });
 
     // Добавляем обработчик загрузки данных
-    map.on('sourcedata', 'cities', (event) => {
-        if (event.type === 'load') {
-            console.log('Данные городов загружены успешно');
-        } else {
-            console.error('Ошибка загрузки данных городов:', event);
+    map.on('sourcedata', (event) => {
+        if (event.sourceId === 'cities') {
+            if (event.isSourceLoaded) {
+                console.log('Данные городов загружены успешно');
+            } else if (event.error) {
+                console.error('Ошибка загрузки данных городов:', event.error);
+            }
         }
     });
 
@@ -96,7 +98,7 @@ map.on('load', () => {
         if (e.features && e.features.length > 0) {
             new maplibregl.Popup()
                 .setLngLat(e.features[0].geometry.coordinates)
-                .setHTML(e.features[0].properties.NAME)
+                .setHTML(e.features[0].properties.NAME || e.features[0].properties.name || 'Город')
                 .addTo(map);
         }
     });
@@ -111,4 +113,20 @@ map.on('load', () => {
     map.on('mouseleave', 'cities-layer', () => {
         map.getCanvas().style.cursor = '';
     });
+
+    // Добавляем обработчики ошибок для всех источников
+    map.on('error', (e) => {
+        console.error('Ошибка карты:', e.error);
+    });
+
+    map.on('sourcedata', (e) => {
+        if (e.error) {
+            console.error('Ошибка загрузки источника', e.sourceId, ':', e.error);
+        }
+    });
+});
+
+// Добавляем глобальную обработку ошибок загрузки
+window.addEventListener('error', (e) => {
+    console.error('Глобальная ошибка:', e.error);
 });
