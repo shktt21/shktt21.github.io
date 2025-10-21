@@ -6,6 +6,7 @@ const map = new maplibregl.Map({
         "sources": {},
         "layers": []
     },
+
     center: [51, 0],
     zoom: 4
 });
@@ -23,7 +24,7 @@ map.on('load', () => {
     // Слой стран
     map.addSource('countries', {
         type: 'geojson',
-        data: './data/countries.geojson',
+        data: 'data/countries.geojson',
         attribution: 'Natural Earth'
     });
 
@@ -39,7 +40,7 @@ map.on('load', () => {
     // Слой рек
     map.addSource('rivers', {
         type: 'geojson',
-        data: './data/rivers.geojson'
+        data: 'data/rivers.geojson'
     });
 
     map.addLayer({
@@ -54,7 +55,7 @@ map.on('load', () => {
     // Слой озер
     map.addSource('lakes', {
         type: 'geojson',
-        data: './data/lakes.geojson'
+        data: 'data/lakes.geojson'
     });
 
     map.addLayer({
@@ -70,15 +71,17 @@ map.on('load', () => {
     // Слой городов
     map.addSource('cities', {
         type: 'geojson',
-        data: './data/cities.geojson'
+        data: 'data/cities.geojson'
     });
 
     // Добавляем обработчик загрузки данных
-    map.on('sourcedata', 'cities', (event) => {
-        if (event.type === 'load') {
-            console.log('Данные городов загружены успешно');
-        } else {
-            console.error('Ошибка загрузки данных городов:', event);
+    map.on('sourcedata', (e) => {
+        if (e.sourceId === 'cities' && e.isSourceLoaded) {
+            if (e.source && e.source.loaded()) {
+                console.log('Данные городов загружены успешно');
+            } else {
+                console.error('Ошибка загрузки данных городов');
+            }
         }
     });
 
@@ -110,5 +113,16 @@ map.on('load', () => {
 
     map.on('mouseleave', 'cities-layer', () => {
         map.getCanvas().style.cursor = '';
+    });
+
+    // Обработчик ошибок загрузки источников
+    map.on('error', (e) => {
+        console.error('Ошибка карты:', e.error);
+    });
+
+    map.on('sourcedata', (e) => {
+        if (e.error) {
+            console.error('Ошибка загрузки источника:', e.sourceId, e.error);
+        }
     });
 });
